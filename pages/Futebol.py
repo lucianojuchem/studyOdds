@@ -151,8 +151,7 @@ def analisar_over_under_gols(data):
 
 st.set_page_config(layout="wide")
 st.title('Análise de Futebol Pré Live com Odds')
-st.subheader('Dados das temporadas européias entre 2016-2024')
-st.subheader('Dados do Brasileirão e J-League (Japão)  2012-2023')
+st.subheader('Dados das temporadas entre 2011-2024')
 
 data = load_data('FootballData.csv')
 
