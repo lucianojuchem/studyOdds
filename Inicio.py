@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="Meu Aplicativo de Análise Esportiva", layout="wide")
 
 # Título da página
-st.title("Bem-vindo ao Estudar Odds!")
+st.title("Bem-vindo ao Inteligência Esportiva!")
 
 # Introdução
 st.markdown("""
