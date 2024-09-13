@@ -27,6 +27,7 @@ odd_max = st.sidebar.number_input("Odd Máxima", min_value=1.01, value=100.0, st
 
 # Adicionar filtros adicionais com a opção de selecionar todos
 st.sidebar.header("Filtros Adicionais")
+
 surface_options = ['Todos'] + list(data['Surface'].unique())
 surface_filter = st.sidebar.multiselect(
     "Tipo de Superfície",
@@ -63,6 +64,10 @@ filtered_data = data[
     (data['Round'].isin(round_filter))
 ]
 
+filtered_data = filtered_data[
+    ((filtered_data['B365W'] >= odd_min) & (filtered_data['B365W'] <= odd_max)) |
+    ((filtered_data['B365L'] >= odd_min) & (filtered_data['B365L'] <= odd_max))
+]
 
 # Filtrar os dados para vitórias e derrotas com base nas odds
 filterVitorias = filtered_data[(filtered_data['B365W'] >= odd_min) & (filtered_data['B365W'] <= odd_max)]
@@ -124,15 +129,15 @@ with col2:
         </div>
     """, unsafe_allow_html=True)
 
-st.subheader("Dados Filtrados")
-st.write(filtered_data)
-st.write(f"Tamanho dos Dados Filtrados: {len(filtered_data)} linhas")
+# st.subheader("Dados Filtrados")
+# st.write(filtered_data)
+# st.write(f"Tamanho dos Dados Filtrados: {len(filtered_data)} linhas")
 
-# Se desejar exibir as vitórias e derrotas filtradas separadamente
-st.subheader("Vitórias Filtradas")
-st.write(filterVitorias)
-st.write(f"Tamanho das Vitórias Filtradas: {len(filterVitorias)} linhas")
+# # Se desejar exibir as vitórias e derrotas filtradas separadamente
+# st.subheader("Vitórias Filtradas")
+# st.write(filterVitorias)
+# st.write(f"Tamanho das Vitórias Filtradas: {len(filterVitorias)} linhas")
 
-st.subheader("Derrotas Filtradas")
-st.write(filterDerrotas)
-st.write(f"Tamanho das Derrotas Filtradas: {len(filterDerrotas)} linhas")
+# st.subheader("Derrotas Filtradas")
+# st.write(filterDerrotas)
+# st.write(f"Tamanho das Derrotas Filtradas: {len(filterDerrotas)} linhas")
