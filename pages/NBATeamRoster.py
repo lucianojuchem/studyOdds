@@ -47,7 +47,7 @@ team_names = {team['full_name']: team['id'] for team in nba_teams}
 st.title("Análise de Jogadores da NBA")
 
 #Selecionar Temporada
-selected_season = st.sidebar.selectbox("Selecione uma temporada",options=['2021-22','2022-23','2023-24','2024-25'])
+selected_season = st.sidebar.selectbox("Selecione uma temporada",options=['2024-25','2023-24','2022-23','2021-22'])
 
 # Selecionar uma equipe
 selected_team = st.sidebar.selectbox("Selecione uma equipe da NBA", options=list(team_names.keys()))
