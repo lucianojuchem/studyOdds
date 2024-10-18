@@ -50,7 +50,7 @@ st.title("Análise de Jogadores da NBA")
 selected_season = st.sidebar.selectbox("Selecione uma temporada",options=['2024-25','2023-24','2022-23','2021-22'])
 
 # Selecionar uma equipe
-selected_team = st.sidebar.selectbox("Selecione uma equipe da NBA", options=list(team_names.keys()))
+selected_team = st.sidebar.selectbox("Selecione uma equipe da NBA", options=list(sorted(team_names.keys())))
 
 # Obter o ID da equipe selecionada
 team_id = team_names[selected_team]
@@ -59,7 +59,7 @@ team_id = team_names[selected_team]
 roster_data = get_team_roster(team_id, selected_season)
 
 # Selecionar um jogador
-selected_player = st.sidebar.selectbox("Selecione um jogador", options=roster_data['PLAYER'].tolist())
+selected_player = st.sidebar.selectbox("Selecione um jogador", options=sorted(roster_data['PLAYER'].tolist()))
 player_id = roster_data.loc[roster_data['PLAYER'] == selected_player, 'PLAYER_ID'].values[0]
 
 # Obter os dados de jogo do jogador

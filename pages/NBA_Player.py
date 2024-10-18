@@ -51,7 +51,7 @@ active_only = st.checkbox("Mostrar apenas jogadores ativos", value=True)
 nba_players = search_players(active_only=active_only)
 
 # Lista de nomes dos jogadores
-player_names = [player['full_name'] for player in nba_players]
+player_names = sorted([player['full_name'] for player in nba_players])
 
 # Campo de seleção de jogador
 selected_player_name = st.selectbox("Selecione um jogador", player_names)
