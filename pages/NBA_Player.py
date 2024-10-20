@@ -28,7 +28,7 @@ def get_player_seasons(player_id):
     return list(range(int(seasons[0]), int(seasons[1]) + 1))
 
 # Função para buscar os boxscores
-def get_player_boxscores(player_id, season='2023'):
+def get_player_boxscores(player_id, season):
     gamelog = playergamelog.PlayerGameLog(player_id=player_id, season=season)
     df = gamelog.get_data_frames()[0]  # Converte para DataFrame
     return df

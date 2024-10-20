@@ -14,13 +14,17 @@ def get_player_gamelog(player_id, season):
     gamelog = PlayerGameLog(player_id=player_id, season=season)
     return gamelog.get_data_frames()[0]
 
-# Função para calcular frequências, porcentagens e odds para a análise de overs
+# Função para calcular frequências, porcentagens, odds e desvio padrão para a análise de overs
 def calculate_over_analysis(data, column, total_games, threshold):
     over_count = (data[column] >= threshold).sum()
+    std_dev = data[column].std()  # Cálculo do desvio padrão
+    
     freq_df = pd.DataFrame({
+        'Total Jogos': [total_games],
         'Frequência': [over_count],
         'Porcentagem': [(over_count / total_games * 100).round(1)],
         'Odds': [(total_games / over_count).round(2) if over_count > 0 else None],
+        'Desvio Padrão': [std_dev.round(2)],  # Adiciona o desvio padrão à tabela
     })
     return freq_df
 
@@ -29,10 +33,12 @@ def display_styled_table(data):
     styled_table = '<div style="display: flex; flex-direction: row; gap: 10px;">'
     for _, row in data.iterrows():
         styled_table += f'''
-        <div style="background-color: #4CAF50;text-align: center; font-size: 22px; color: white; padding: 20px; border-radius: 5px; flex: 1;">
-            <strong>Frequência:</strong> {row['Frequência']}<br>
-            <strong>Porcentagem:</strong> {row['Porcentagem']}%<br>
-            <strong>Odds:</strong> {row['Odds']}
+        <div style="background-color: #4CAF50;text-align: center; font-size: 24px; color: white; padding: 20px; border-radius: 5px; flex: 1;">
+            <strong> {row['Total Jogos']} jogos na temporada</strong><br>
+            <strong>{row['Frequência']} ocorrências</strong><br>
+            <strong>{row['Porcentagem']}%</strong> <br>
+            <strong>Odd: {row['Odds']} </strong> <br>
+            <strong>Desvio Padrão <br> {row['Desvio Padrão']}</strong> 
         </div>
         '''
     styled_table += '</div>'
@@ -117,6 +123,3 @@ if not gamelog_data.empty:
         st.write("Gráfico com frêquencias  de 3 PONTOS")
         st.bar_chart(gamelog_data['FG3M'].value_counts())
 
-# # Executar a aplicação
-# if __name__ == "__main__":
-#     st.write("Esta é uma análise interativa de jogadores da NBA.")
