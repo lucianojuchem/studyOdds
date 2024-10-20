@@ -72,24 +72,17 @@ if player_id:
     df = get_player_boxscores(player_id, str(season))
 
     if not df.empty:
-        st.subheader(f"Infos do {selected_player_name} na temporada {season}")
-                
         # Exibir número de partidas disputadas na temporada
         total_games = len(df)
         st.subheader(f"{selected_player_name} disputou {total_games} partidas na temporada {season}")
 
         # Selecionar estatísticas para análise
-        stats_options = ['PTS', 'AST', 'REB', 'FG3M','FG3A', 'STL', 'BLK', 'TOV','MIN']  # Pontos, assistências, rebotes, bolas de 3, roubos, bloqueios, turnovers
+        stats_options = ['PTS', 'AST', 'REB', 'FG3M','FG3A', 'STL', 'BLK', 'TOV','MIN']
         selected_stat = st.selectbox("Selecione a estatística para o gráfico de frequência", stats_options)
 
         # Exibir gráfico de frequência para a estatística selecionada
         st.subheader(f"Frequência de {selected_stat}")
         st.bar_chart(df[selected_stat].value_counts().sort_index())
-
-
-        # Gráficos com dados de múltiplas estatísticas
-        #st.subheader("Análise de Pontos, Assistências, Rebotes")
-        #st.line_chart(df[['PTS', 'AST', 'REB']])
 
         # Definir as faixas de pontos
         point_thresholds = [5, 10, 15, 20, 25, 30, 35, 40]  # Faixas de 5 em 5 até 40
@@ -112,13 +105,6 @@ if player_id:
         ranges_df['Odds'] = (100 / ranges_df['Frequência Relativa (%)']).round(2)
         ranges_df.set_index('Faixa de Pontos', inplace=True)
                
-        # # Exibir gráfico de porcentagem
-        # st.subheader(f"Ocorrência de Pontos")
-        # st.bar_chart( ranges_df['Frequência Relativa (%)'], color='#ff7000')
-
-        # st.subheader("Faixa de Pontos com Odds")
-        # st.dataframe(ranges_df) # Exibir a tabela
-
         # Médias da temporada
         season_averages = calculate_averages(df, stats_options).round(1)       
 
@@ -159,7 +145,7 @@ if player_id:
             with col2:
                 st.subheader("Últimos 3 Jogos")
                 for stat in stats_options:
-                    delta_value = (last_3_games_avg[stat] - season_averages[stat]).round(1)  # Arredondar delta
+                    delta_value = (last_3_games_avg[stat] - season_averages[stat]).round(1)
                     st.metric(label=stat, value=last_3_games_avg[stat], delta=delta_value)
         else:
             col2.write("Menos de 3 jogos.")
@@ -169,7 +155,7 @@ if player_id:
             with col3:
                 st.subheader("Últimos 5 Jogos")
                 for stat in stats_options:
-                    delta_value = (last_5_games_avg[stat] - season_averages[stat]).round(1)  # Arredondar delta
+                    delta_value = (last_5_games_avg[stat] - season_averages[stat]).round(1)
                     st.metric(label=stat, value=last_5_games_avg[stat], delta=delta_value)
         else:
             col3.write("Menos de 5 jogos.")
@@ -179,12 +165,12 @@ if player_id:
             with col4:
                 st.subheader("Últimos 10 Jogos")
                 for stat in stats_options:
-                    delta_value = (last_10_games_avg[stat] - season_averages[stat]).round(1)  # Arredondar delta
+                    delta_value = (last_10_games_avg[stat] - season_averages[stat]).round(1)
                     st.metric(label=stat, value=last_10_games_avg[stat], delta=delta_value)
         else:
             col4.write("Menos de 10 jogos.")
 
-        st.dataframe(df)  # Exibe os dados em uma tabela
+        #st.dataframe(df)  
     else:
         st.write(f"Sem dados disponíveis para a temporada {season}.")
 else:
