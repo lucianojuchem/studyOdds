@@ -2,17 +2,19 @@ import streamlit as st
 import pandas as pd
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import CommonTeamRoster, PlayerGameLog
+from functions import get_team_roster as getTeamRoster
+from functions import get_player_gamelog as playerGamelog
 
 # Função para obter o roster da equipe selecionada
-def get_team_roster(team_id, season):
-    roster = CommonTeamRoster(team_id=team_id, season=season)
-    roster_data = roster.get_data_frames()[0]
-    return roster_data
+# def get_team_roster(team_id, season):
+#     roster = CommonTeamRoster(team_id=team_id, season=season)
+#     roster_data = roster.get_data_frames()[0]
+#     return roster_data
 
 # Função para obter os dados de jogo de um jogador
-def get_player_gamelog(player_id, season):
-    gamelog = PlayerGameLog(player_id=player_id, season=season)
-    return gamelog.get_data_frames()[0]
+# def get_player_gamelog(player_id, season):
+#     gamelog = PlayerGameLog(player_id=player_id, season=season)
+#     return gamelog.get_data_frames()[0]
 
 # Função para calcular frequências, porcentagens, odds e desvio padrão para a análise de overs
 def calculate_over_analysis(data, column, total_games, threshold):
@@ -62,14 +64,14 @@ selected_team = st.sidebar.selectbox("Selecione uma equipe da NBA", options=list
 team_id = team_names[selected_team]
 
 # Obter o roster da equipe
-roster_data = get_team_roster(team_id, selected_season)
+roster_data = getTeamRoster(team_id, selected_season)
 
 # Selecionar um jogador
 selected_player = st.sidebar.selectbox("Selecione um jogador", options=sorted(roster_data['PLAYER'].tolist()))
 player_id = roster_data.loc[roster_data['PLAYER'] == selected_player, 'PLAYER_ID'].values[0]
 
 # Obter os dados de jogo do jogador
-gamelog_data = get_player_gamelog(player_id, selected_season)
+gamelog_data = playerGamelog(player_id, selected_season)
 
 # Gerar análises para estatísticas selecionadas
 if not gamelog_data.empty:
