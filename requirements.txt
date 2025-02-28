@@ -11,3 +11,4 @@ lxml
 nba_api
 xgboost
 scikit-learn
+gspread 
