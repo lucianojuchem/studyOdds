@@ -11,4 +11,6 @@ lxml
 nba_api
 xgboost
 scikit-learn
-gspread 
+gspread
+google-auth-oauthlib 
+google-auth-httplib2
