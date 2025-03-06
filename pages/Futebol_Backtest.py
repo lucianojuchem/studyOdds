@@ -37,12 +37,14 @@ else:
     data_filtrada = data[data['Div'].isin(ligas_selecionadas)]
 
 
-tipo_aposta = st.sidebar.radio("Seleção da Equipe para filtro das Odds:", ('Casa', 'Visitante'))
+tipo_aposta = st.sidebar.radio("Seleção da Equipe para filtro das Odds:", ('Casa','Empate', 'Visitante'))
 odd_min = st.sidebar.number_input('Odd Mínima', min_value=1.01, max_value=50.0, value=1.01)
 odd_max = st.sidebar.number_input('Odd Máxima', min_value=1.02, max_value=100.0, value=100.0)
     
 if tipo_aposta == 'Casa':
     data_filtrada = data_filtrada[(data_filtrada['B365H'] >= odd_min) & (data_filtrada['B365H'] <= odd_max)]
+elif tipo_aposta == 'Empate':
+     data_filtrada = data_filtrada[(data_filtrada['B365D'] >= odd_min) & (data_filtrada['B365D'] <= odd_max)]
 elif tipo_aposta == 'Visitante':
     data_filtrada = data_filtrada[(data_filtrada['B365A'] >= odd_min) & (data_filtrada['B365A'] <= odd_max)]
 
