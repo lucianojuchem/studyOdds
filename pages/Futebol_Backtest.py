@@ -22,6 +22,7 @@ def load_data():
 
 data = load_data()
 
+st.sidebar.header('Filtros dos Dados')
 # Filtro de ligas (com opção "Todas")
 ligas = ['Todas'] + list(data['Div'].unique())
 ligas_selecionadas = st.sidebar.multiselect(
@@ -37,21 +38,20 @@ else:
     data_filtrada = data[data['Div'].isin(ligas_selecionadas)]
 
 
-tipo_aposta = st.sidebar.radio("Seleção da Equipe para filtro das Odds:", ('Casa','Empate', 'Visitante'))
+tipo_aposta = st.sidebar.radio("Seleção da Equipe para filtro das Odds:", ('Casa','Empate', 'Visitante'), horizontal=True)
 odd_min = st.sidebar.number_input('Odd Mínima', min_value=1.01, max_value=50.0, value=1.01)
 odd_max = st.sidebar.number_input('Odd Máxima', min_value=1.02, max_value=100.0, value=100.0)
     
 if tipo_aposta == 'Casa':
     data_filtrada = data_filtrada[(data_filtrada['B365H'] >= odd_min) & (data_filtrada['B365H'] <= odd_max)]
 elif tipo_aposta == 'Empate':
-     data_filtrada = data_filtrada[(data_filtrada['B365D'] >= odd_min) & (data_filtrada['B365D'] <= odd_max)]
+    data_filtrada = data_filtrada[(data_filtrada['B365D'] >= odd_min) & (data_filtrada['B365D'] <= odd_max)]
 elif tipo_aposta == 'Visitante':
     data_filtrada = data_filtrada[(data_filtrada['B365A'] >= odd_min) & (data_filtrada['B365A'] <= odd_max)]
 
 # Cálculo da odd média com base nos valores de odd mínima e máxima inseridos
 odd_media = (odd_min + odd_max) / 2
-st.sidebar.write(f"Odd Média Usada para Filtro: {odd_media:.2f}")
-
+st.sidebar.write(f"Odd Média do Filtro: {odd_media:.2f}")
 
 # --- Configurações de Backtest ---
 st.sidebar.header('Configurações de Backtest')
@@ -64,15 +64,11 @@ mercado_aposta = st.sidebar.radio("Selecione a opção de aposta:",
 
 # Banca inicial e unidade apostada
 banca_inicial = st.sidebar.number_input('Banca Inicial', value=1000.0)
-tipo_aposta_valor = st.sidebar.radio('Tipo de Valor Apostado:', ('Valor Fixo', 'Porcentagem da Banca'))
-if tipo_aposta_valor == 'Valor Fixo':
-    valor_aposta = st.sidebar.number_input('Valor da Aposta Fixa', value=10.0)
-else:
-    porcentagem_aposta = st.sidebar.slider('Porcentagem da Banca por Aposta', 1, 100, 10)
-    valor_aposta = banca_inicial * (porcentagem_aposta / 100)
+valor_aposta = st.sidebar.number_input('Valor da Aposta Fixa', value=10.0)
+
 
 # Função para calcular o backtest
-def calcular_backtest(data, mercado, banca_inicial, valor_aposta, valor_fixo=True):
+def calcular_backtest(data, mercado, banca_inicial, valor_aposta):
     banca = banca_inicial
     total_apostas = 0
     apostas_ganhas = 0
@@ -103,10 +99,6 @@ def calcular_backtest(data, mercado, banca_inicial, valor_aposta, valor_fixo=Tru
             odd = row['B365_12']
             aposta_vencedora = (resultado == 'H' or resultado == 'A')  # Casa ou Visitante
 
-        # Calcular o valor da aposta
-        if not valor_fixo:  # Se for aposta percentual, recalcula a cada iteração
-            valor_aposta = banca * (porcentagem_aposta / 100)
-
         # Realizar a aposta
         if aposta_vencedora:
             ganho = valor_aposta * (odd - 1)
@@ -123,15 +115,14 @@ def calcular_backtest(data, mercado, banca_inicial, valor_aposta, valor_fixo=Tru
     return banca, total_apostas, apostas_ganhas, apostas_perdidas, roi, evolucao_banca
 
 # Função para analisar a lucratividade por liga
-def analisar_lucratividade_por_liga(data, mercado, banca_inicial, valor_aposta, valor_fixo=True):
+def analisar_lucratividade_por_liga(data, mercado, banca_inicial, valor_aposta):
     ligas = data['Div'].unique()
     resultados = []
     
     for liga in ligas:
         data_liga = data[data['Div'] == liga]
         banca_final, total_apostas, apostas_ganhas, apostas_perdidas, roi, evolucao_banca = calcular_backtest(
-            data_liga, mercado, banca_inicial, valor_aposta, valor_fixo
-        )
+            data_liga, mercado, banca_inicial, valor_aposta)
         resultados.append({
             'Liga': liga,
             'Banca Final': banca_final,
@@ -210,7 +201,7 @@ def plot_lucratividade_por_liga(df_lucratividade):
     st.plotly_chart(fig)
 
 # Função para calcular a lucratividade por faixa de odds
-def calcular_lucratividade_por_faixa(data, mercado, banca_inicial, valor_aposta, valor_fixo=True):
+def calcular_lucratividade_por_faixa(data, mercado, banca_inicial, valor_aposta):
     # Escolher a coluna de odds com base no mercado selecionado
     if mercado == '1 (Casa)':
         odds_col = 'B365H'
@@ -226,8 +217,8 @@ def calcular_lucratividade_por_faixa(data, mercado, banca_inicial, valor_aposta,
         odds_col = 'B365_12'
 
     # Definir faixas de odds
-    bins = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, float('inf')]
-    labels = ['1.0-1.5', '1.5-2.0', '2.0-2.5', '2.5-3.0', '3.0-3.5', '3.5-4.0', '4.0-4.5', '4.5-5.0', '5.0-6.0', '6.0-7.0', '7.0-8.0', '8.0-9.0', '9.0-10.0', '10.0-11.0', '11.0-12.0', '12.0-13.0', '13.0-14.0', '14.0-15.0', '15.0+']
+    bins = [1.01, 1.51, 2.01, 2.51, 3.01, 3.51, 4.01, 4.51, 5.01, 6.01, 7.01, 8.01, 9.01, 10.01, 11.01, 12.01, 13.01, 14.01, 15.01, float('inf')]
+    labels = ['1.01-1.5', '1.51-2.0', '2.01-2.5', '2.51-3.0', '3.01-3.5', '3.51-4.0', '4.01-4.5', '4.51-5.0', '5.01-6.0', '6.01-7.0', '7.01-8.0', '8.01-9.0', '9.01-10.0', '10.01-11.0', '11.01-12.0', '12.01-13.0', '13.01-14.0', '14.01-15.0', '15.0+']
 
 
     # Aplicar as faixas à coluna de odds
@@ -243,7 +234,7 @@ def calcular_lucratividade_por_faixa(data, mercado, banca_inicial, valor_aposta,
         if not data_faixa.empty:
             # Aplicar o backtest na faixa
             banca_final, total_apostas, apostas_ganhas, apostas_perdidas, roi, evolucao_banca = calcular_backtest(
-                data_faixa, mercado, banca_inicial, valor_aposta, valor_fixo
+                data_faixa, mercado, banca_inicial, valor_aposta
             )
             resultados.append({
                 'Faixa de Odds': str(faixa),  # Convertendo o intervalo para string
@@ -269,56 +260,61 @@ def plot_lucratividade_por_faixa(df_lucratividade):
 
 # --- Aplicar o Backtest ---
 if st.button('Aplicar Backtest'):
-    banca_final, total_apostas, apostas_ganhas, apostas_perdidas, roi, evolucao_banca = calcular_backtest(
-        data_filtrada, mercado_aposta, banca_inicial, valor_aposta, valor_fixo = (tipo_aposta_valor == 'Valor Fixo')
+
+    if len(data_filtrada) == 0:
+        st.write("Sem dados para aplicar o Backtest. Verifique os filtros e aplique o Backtest novamente.")
+    elif len(data_filtrada) >= 1 :
+        banca_final, total_apostas, apostas_ganhas, apostas_perdidas, roi, evolucao_banca = calcular_backtest(
+        data_filtrada, mercado_aposta, banca_inicial, valor_aposta
     )
     
-    # Exibição dos resultados com retângulos coloridos e fonte preta
-    st.subheader('Resultados do Backtest')
+        # Exibição dos resultados com retângulos coloridos e fonte preta
+        st.subheader('Resultados do Backtest')
 
-    # Estilo dos retângulos com cor da fonte preta
-    st.markdown(f"""
-    <div style="background-color:#f0f0f0;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
+        # Estilo dos retângulos com cor da fonte preta
+        st.markdown(f"""
+        <div style="background-color:#f0f0f0;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
         <strong>Banca Final:</strong> {banca_final:.2f}
-    </div>
-    <div style="background-color:#e0f7fa;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
+        </div>
+        <div style="background-color:#e0f7fa;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
         <strong>Total de Apostas:</strong> {total_apostas}
-    </div>
-    <div style="background-color:#c8e6c9;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
+        </div>
+        <div style="background-color:#c8e6c9;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
         <strong>Apostas Ganhas:</strong> {apostas_ganhas}
-    </div>
-    <div style="background-color:#ffcdd2;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
+        </div>
+        <div style="background-color:#ffcdd2;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
         <strong>Apostas Perdidas:</strong> {apostas_perdidas}
-    </div>
-    <div style="background-color:#ffecb3;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
+        </div>
+        <div style="background-color:#ffecb3;color:black;padding:10px;border-radius:10px;margin-bottom:10px;">
         <strong>ROI:</strong> {roi:.2f}%
-    </div>
-""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
 
-    # Mostrar a evolução da banca
-    st.line_chart(evolucao_banca)
+        # Mostrar a evolução da banca
+        st.line_chart(evolucao_banca)
 
-    df_lucratividade = analisar_lucratividade_por_liga(data_filtrada, mercado_aposta, banca_inicial, valor_aposta, valor_fixo=(tipo_aposta_valor == 'Valor Fixo'))
+        df_lucratividade = analisar_lucratividade_por_liga(data_filtrada, mercado_aposta, banca_inicial, valor_aposta)
+        st.table(df_lucratividade)
     
-    # Tabela de lucratividade por liga
-    plot_lucratividade_por_liga(df_lucratividade) 
-    st.dataframe(estilizar_lucratividade(df_lucratividade))
+        # Tabela de lucratividade por liga
+        plot_lucratividade_por_liga(df_lucratividade) 
+        st.dataframe(estilizar_lucratividade(df_lucratividade))
 
-    # Plotar gráficos adicionais
-    st.subheader('Distribuição das Odds')
-    plot_distribuicao_odds(data_filtrada)
+        # Plotar gráficos adicionais
+        st.subheader('Distribuição das Odds')
+        plot_distribuicao_odds(data_filtrada)
 
-# --- Lucratividade por faixa de odds ---
-    st.subheader('Lucratividade por Faixa de Odds')
+        # --- Lucratividade por faixa de odds ---
+        st.subheader('Lucratividade por Faixa de Odds')
 
-    # Calcular a lucratividade por faixa de odds
-    df_lucratividade_faixa = calcular_lucratividade_por_faixa(
-        data_filtrada, mercado_aposta, banca_inicial, valor_aposta, valor_fixo=(tipo_aposta_valor == 'Valor Fixo')
-    )
+        # Calcular a lucratividade por faixa de odds
+        df_lucratividade_faixa = calcular_lucratividade_por_faixa(
+            data_filtrada, mercado_aposta, banca_inicial, valor_aposta
+        )
 
-    # Exibir o gráfico de lucratividade por faixa de odds
-    plot_lucratividade_por_faixa(df_lucratividade_faixa)
+        # Exibir o gráfico de lucratividade por faixa de odds
+        plot_lucratividade_por_faixa(df_lucratividade_faixa)
 
-    # Exibir a tabela de lucratividade por faixa de odds
-    st.dataframe(df_lucratividade_faixa)
+        # Exibir a tabela de lucratividade por faixa de odds
+        st.dataframe(df_lucratividade_faixa)

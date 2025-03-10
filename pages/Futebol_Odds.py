@@ -118,6 +118,7 @@ def count_score_frequencies(data):
     score_counts = data['Score'].value_counts().reset_index()
     score_counts.columns = ['Score', 'Frequência']
     score_counts['Porcentagem'] = (score_counts['Frequência'] / len(data)) * 100
+    score_counts['Odd'] = 100 / score_counts['Porcentagem']  
     return score_counts
 
 def criar_colunas_over_under_gols(data):
@@ -176,6 +177,8 @@ with st.sidebar:
     st.subheader('Filtre por uma faixa de odds \n Odds de referência da BET 365')
     min_odds = st.number_input('Odd mínima', min_value=1.01, value=1.01)
     max_odds = st.number_input('Odd máxima', min_value=1.01, value=1000.0)
+    odd_media = (min_odds + max_odds) / 2
+    st.sidebar.write(f"Odd Média do Filtro: {odd_media:.2f}")
 
     
 # Filtrando os dados
@@ -200,11 +203,11 @@ def colored_metric(label, value, color):
 
 def create_metric(title, value, frequency, odds, color):
     return f"""
-    <div style="background-color: {color}; padding: 10px; border-radius: 5px; text-align: center;">
-        <h3 style="font-size: 24px; margin: 0;">{title}</h3>
-        <p style="font-size: 22px; margin: 5px 0;">{value} jogos</p>
-        <p style="font-size: 22px; margin: 5px 0;">{frequency}</p>
-        <p style="font-size: 22px; margin: 5px 0;">Odd: {odds}</p>
+    <div style="background-color: {color}; padding: 10px; border-radius: 5px;text-align: center; width: 240px; height: 180px; margin: 10px; padding: 10px;">
+        <h3 style="font-size: 22px; margin: 0;">{title}</h3>
+        <p style="font-size: 18px; margin: 5px 0;">{value} jogos</p>
+        <p style="font-size: 18px; margin: 5px 0;">{frequency}</p>
+        <p style="font-size: 18px; margin: 5px 0;">Odd: {odds}</p>
     </div>
     """
 
@@ -228,18 +231,19 @@ def display_score_results(score_counts):
                 score = score_counts.iloc[index]['Score']
                 frequency = score_counts.iloc[index]['Frequência']
                 percentage = score_counts.iloc[index]['Porcentagem']
+                odd = score_counts.iloc[index]['Odd']
 
                 # Calcula a cor com base na porcentagem
-                color_intensity = int((percentage / max_percentage) * 255)
-                color = f'rgb({255 - color_intensity}, {color_intensity}, 0)'
+                color_intensity = int((percentage / max_percentage) * 150)
+                color = f'rgb({230 - color_intensity}, {color_intensity}, 0)'
 
                 with cols[j]:
                     st.markdown(
                         f"""
-                        <div style="text-align: center; background-color: {color}; color: white; width: 180px; height: 120px; 
+                        <div style="text-align: center; background-color: {color}; color: white; width: 200px; height: 160px; 
                         text-align: center; justify-content: center; margin: 5px; font-size: 22px; border-radius: 10px; padding: 10px;">
                             <strong>{score}</strong><br>
-                            <span style="font-size: 18px;">Frequência: {frequency}<br> {percentage:.2f}%</span>
+                            <span style="font-size: 18px;">Frequência: {frequency}<br> {percentage:.2f}%<br> Odd: {odd:.2f} </span>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -337,7 +341,7 @@ for i, under in enumerate([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5]):
         ), unsafe_allow_html=True)
 
 # Exibir Métricas Ofensivas e Defensivas
-st.subheader("Médias de Ataque e Defesa")
+st.header("Médias de Ataque e Defesa")
 
 # Criar colunas para exibir as métricas ofensivas e defensivas verticalmente
 col1, col2, col3 = st.columns([1, 1, 1])
@@ -378,8 +382,8 @@ with col3:
 
 
 # Exibir dados filtrados
-st.subheader('Dados filtrados')
-st.dataframe(filtered_data)
+#st.subheader('Dados filtrados')
+#st.dataframe(filtered_data)
 
 # Opção para download dos dados filtrados
 # st.subheader('Baixar dados filtrados')
