@@ -26,11 +26,11 @@ urlSheet = "https://docs.google.com/spreadsheets/d/1GWj9aNoCO57hW97vu9gJb0XESbis
 dados = gc.open_by_url(urlSheet).worksheet("Matches")
 equipes = gc.open_by_url(urlSheet).worksheet("Teams")
 
-
-teams = equipes.get_all_values()
 data = dados.get_all_values()
+teams = equipes.get_all_values()
 
 data = pd.DataFrame(data)
 teams = pd.DataFrame(teams)
 
-st.dataframe(data)
+#st.dataframe(data)
+st.subheader("Página em desenvolvimento!")

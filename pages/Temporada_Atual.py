@@ -29,4 +29,5 @@ data = pd.DataFrame()
 
 data = dados.get_all_values()
 
-st.dataframe(data)
+#st.dataframe(data)
+st.subheader("Página em desenvolvimento!")
