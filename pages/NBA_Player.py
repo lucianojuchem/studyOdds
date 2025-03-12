@@ -31,6 +31,8 @@ def get_player_seasons(player_id):
 def get_player_boxscores(player_id, season):
     gamelog = playergamelog.PlayerGameLog(player_id=player_id, season=season)
     df = gamelog.get_data_frames()[0]  # Converte para DataFrame
+    df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
+    df = df.sort_values(by="GAME_DATE", ascending=True)
     return df
 
 # Função para calcular médias
