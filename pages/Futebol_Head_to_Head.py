@@ -133,8 +133,8 @@ def display_score_results(score_counts):
                 odd = score_counts.iloc[index]['Odd']
 
                 # Calcula a cor com base na porcentagem
-                color_intensity = int((percentage / max_percentage) * 150)
-                color = f'rgb({200 - color_intensity}, {color_intensity}, 50)'
+                color_intensity = int((percentage / max_percentage) * 225)
+                color = f'rgb({250 - color_intensity}, {color_intensity}, 50)'
 
                 with cols[j]:
                     st.markdown(
