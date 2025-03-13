@@ -254,10 +254,6 @@ def plot_lucratividade_por_faixa(df_lucratividade):
                  title='Lucratividade por Faixa de Odds')
     st.plotly_chart(fig)
 
-# Exibir os dados filtrados para visualização
-#st.subheader("Dados Filtrados")
-#st.dataframe(data_filtrada)  # Exibe o DataFrame filtrado no Streamlit
-
 # --- Aplicar o Backtest ---
 if st.button('Aplicar Backtest'):
 
@@ -290,12 +286,12 @@ if st.button('Aplicar Backtest'):
         </div>
         """, unsafe_allow_html=True)
 
-
+        st.subheader("Evolução da Banca")
         # Mostrar a evolução da banca
         st.line_chart(evolucao_banca)
 
         df_lucratividade = analisar_lucratividade_por_liga(data_filtrada, mercado_aposta, banca_inicial, valor_aposta)
-        st.table(df_lucratividade)
+        #st.table(df_lucratividade)
     
         # Tabela de lucratividade por liga
         plot_lucratividade_por_liga(df_lucratividade) 
