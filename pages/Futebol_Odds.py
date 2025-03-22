@@ -6,6 +6,15 @@ import pandas as pd
 def load_data(file):
     data = pd.read_csv(file)
     data['Score'] = data['FTHG'].astype(str) + 'x' + data['FTAG'].astype(str)
+
+    data['Goleada'] = 0
+    
+    goleada_casa = (data['FTHG'] >= 4) & (data['FTHG'] > data['FTAG'])
+    goleada_fora = (data['FTAG'] >= 4) & (data['FTAG'] > data['FTHG'])
+    
+    data.loc[goleada_casa, 'Goleada'] = 1
+    data.loc[goleada_fora, 'Goleada'] = 2
+
     return data
 
 # Função para filtrar os dados por odds
@@ -249,6 +258,71 @@ def display_score_results(score_counts):
                         unsafe_allow_html=True
                     )
 
+def calcularGoleada(df):
+    """
+    Calcula a frequência das goleadas e ajusta as probabilidades.
+    
+    Parâmetros:
+    df (pd.DataFrame): DataFrame contendo a coluna 'marcador_goleada'.
+    
+    Retorna:
+    dict: Dicionário com as probabilidades ajustadas.
+    """
+    total_jogos = len(df)
+
+    freq_casa = (df['Goleada'] == 1).sum()
+    freq_fora = (df['Goleada'] == 2).sum()
+    
+    prob_casa = freq_casa / total_jogos
+    prob_fora = (freq_fora / 2) / total_jogos  # Ajustando a probabilidade do visitante
+    
+    odds_casa = 1 / prob_casa if prob_casa > 0 else float('inf')
+    odds_fora = 1 / prob_fora if prob_fora > 0 else float('inf')
+    
+    return {
+        'Frequência Goleada Casa': freq_casa,
+        'Probabilidade Goleada Casa': prob_casa,
+        'Odds Goleada Casa': odds_casa,
+        'Frequência Goleada Visitante': freq_fora,
+        'Probabilidade Goleada Visitante Ajustada': prob_fora,
+        'Odds Goleada Visitante Ajustada': odds_fora
+    }
+
+def exibirGoleada(probabilidades):
+    """
+    Exibe os resultados de frequência, probabilidade e odds em duas colunas no Streamlit.
+    
+    Parâmetros:
+    probabilidades (dict): Dicionário contendo as estatísticas.
+    """
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(
+        f"""
+        <div style="text-align: center; background-color: #061c96; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <h4 style="color: white; margin-bottom: 5px;"> Goleada da Casa</h4>
+            <p style="color: white; font-size: 24px; margin: 0;">{probabilidades['Frequência Goleada Casa']}</p>
+            <p style="color: white;font-size: 20px; margin: 0;"> {probabilidades['Probabilidade Goleada Casa']:.2%}</p>
+            <p style="color: white;font-size: 20px; margin: 0;"> Odd Justa: {probabilidades['Odds Goleada Casa']:.2f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    with col2:
+        st.markdown(
+        f"""
+        <div style="text-align: center; background-color: #061c96; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <h4 style="color: white; margin-bottom: 5px;"> Goleada Visitante</h4>
+            <p style="color: white; font-size: 24px; margin: 0;">{probabilidades['Frequência Goleada Visitante']}</p>
+            <p style="color: white;font-size: 20px; margin: 0;"> {probabilidades['Probabilidade Goleada Visitante Ajustada']:.2%}</p>
+            <p style="color: white;font-size: 20px; margin: 0;"> Odd Justa: {probabilidades['Odds Goleada Visitante Ajustada']:.2f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 # Exibir o total de jogos filtrados em uma métrica destacada
 total_games = len(filtered_data)
 st.markdown(f"""
@@ -302,6 +376,11 @@ with col3:
         """,
         unsafe_allow_html=True
     )
+
+
+st.subheader('Analise de Goleadas')
+goleadas = calcularGoleada(filtered_data)
+exibirGoleada(goleadas)
 
 # Calcular e exibir a tabela de resultados mais frequentes
 score_counts = count_score_frequencies(filtered_data)

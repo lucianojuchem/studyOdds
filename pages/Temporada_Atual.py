@@ -25,9 +25,14 @@ gc = gs.authorize(creds)
 
 dados = gc.open_by_url("https://docs.google.com/spreadsheets/d/1LyRKhG6ofCX20SEskr4mb00rw0nl38NbQvG_h3aL_0U/edit?gid=1735547126#gid=1735547126").worksheet("BRA")
 
-data = pd.DataFrame()
+#data = pd.DataFrame()
 
 data = dados.get_all_values()
+
+data = pd.DataFrame(data)
+
+data.columns = data.iloc[0]
+data = data[1:].reset_index(drop=True)
 
 #st.dataframe(data)
 st.subheader("Página em desenvolvimento!")
