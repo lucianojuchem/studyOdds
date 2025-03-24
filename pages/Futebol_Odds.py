@@ -283,7 +283,7 @@ def calcularGoleada(df):
         'Frequência Goleada Casa': freq_casa,
         'Probabilidade Goleada Casa': prob_casa,
         'Odds Goleada Casa': odds_casa,
-        'Frequência Goleada Visitante': freq_fora,
+        'Frequência Goleada Visitante': int(freq_fora / 2),
         'Probabilidade Goleada Visitante Ajustada': prob_fora,
         'Odds Goleada Visitante Ajustada': odds_fora
     }
