@@ -259,42 +259,30 @@ def display_score_results(score_counts):
                     )
 
 def calcularGoleada(df):
-    """
-    Calcula a frequência das goleadas e ajusta as probabilidades.
-    
-    Parâmetros:
-    df (pd.DataFrame): DataFrame contendo a coluna 'marcador_goleada'.
-    
-    Retorna:
-    dict: Dicionário com as probabilidades ajustadas.
-    """
+  
     total_jogos = len(df)
 
     freq_casa = (df['Goleada'] == 1).sum()
     freq_fora = (df['Goleada'] == 2).sum()
     
     prob_casa = freq_casa / total_jogos
-    prob_fora = (freq_fora / 2) / total_jogos  # Ajustando a probabilidade do visitante
+    prob_fora = freq_fora / total_jogos
     
     odds_casa = 1 / prob_casa if prob_casa > 0 else float('inf')
     odds_fora = 1 / prob_fora if prob_fora > 0 else float('inf')
-    
+
+       
     return {
         'Frequência Goleada Casa': freq_casa,
         'Probabilidade Goleada Casa': prob_casa,
         'Odds Goleada Casa': odds_casa,
-        'Frequência Goleada Visitante': int(freq_fora / 2),
+        'Frequência Goleada Visitante': freq_fora,
         'Probabilidade Goleada Visitante Ajustada': prob_fora,
         'Odds Goleada Visitante Ajustada': odds_fora
     }
 
 def exibirGoleada(probabilidades):
-    """
-    Exibe os resultados de frequência, probabilidade e odds em duas colunas no Streamlit.
     
-    Parâmetros:
-    probabilidades (dict): Dicionário contendo as estatísticas.
-    """
     col1, col2 = st.columns(2)
     
     with col1:
