@@ -9,11 +9,7 @@ st.title("Bem-vindo ao Inteligência Esportiva!")
 # Introdução
 st.markdown("""
 Este aplicativo oferece análises de futebol, tênis e NBA baseadas em dados históricos e estatísticas avançadas. Use o menu lateral para navegar entre as funcionalidades.
-            
-**Ajude a manter o projeto com mais funcionalidades e melhorias!**
 """)
-
-st.image("qrcode-pix.png", caption="Pix de Contribuição ao Projeto", )
 
 # Seção da Página 'Futebol Backtest'
 st.header("Futebol Backtest")
